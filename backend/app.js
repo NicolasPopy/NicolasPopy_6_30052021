@@ -10,24 +10,11 @@ mongoose.connect('mongodb+srv://OCAdmin:SoPekocko!42@cluster0.qm0fk.mongodb.net/
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
   const sauceRoutes = require('./routes/sauce');
+  const utilisateurRoutes = require("./routes/utilisateur");
 
-app.use((req, res, next) => {
-  console.log('Requête reçue !');
-  next();
-});
+  app.use("/api/sauce", sauceRoutes);
+  app.use("/api/auth", utilisateurRoutes);
 
-app.use((req, res, next) => {
-  res.status(201);
-  next();
-});
 
-app.use((req, res, next) => {
-  res.json({ message: 'Votre requête a bien été reçue !' });
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log('Réponse envoyée avec succès !');
-});
 
 module.exports = app;
