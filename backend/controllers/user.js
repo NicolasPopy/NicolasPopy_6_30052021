@@ -1,15 +1,20 @@
 
-const Utilisateur = require("../models/utilisateur");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 
 exports.signup = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
-      const utilisateur = new Utilisateur({
+      console.log("user create");
+      const user = new User({
+        userId: new mongoose.mongo.ObjectId(),
         email: req.body.email,
         password: hash,
       });
+      console.log(user);
       user
         .save()
         .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
