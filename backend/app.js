@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
 
@@ -7,6 +8,8 @@ var bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,7 +31,7 @@ mongoose.connect('mongodb+srv://OCAdmin:SoPekocko!42@cluster0.qm0fk.mongodb.net/
   const sauceRoutes = require('./routes/sauce');
   const userRoutes = require("./routes/user");
 
-  app.use("/api/sauce", sauceRoutes);
+  app.use("/api/sauces", sauceRoutes);
   app.use("/api/auth", userRoutes);
 
 
