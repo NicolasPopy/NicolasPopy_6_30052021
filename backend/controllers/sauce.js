@@ -48,3 +48,28 @@ exports.deleteSauce = (req,res,next) => {
     .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
     .catch(error => res.status(400).json({ error }));
 }
+
+
+exports.likeSauce = (req,res,next) => {
+    var _id = req.params.id;
+    var userId = req.body.userId;
+    var like = req.body.like;
+
+    var sauce = Sauce.findById(_id);
+    
+
+
+switch (like) {
+    case '-1':
+        console.log('Dislike');
+        break
+    case '0':
+        console.log('Annule');
+        break;
+    case '1':
+        console.log('Like');
+        break;
+
+};
+
+}
