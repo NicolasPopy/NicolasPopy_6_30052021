@@ -18,12 +18,14 @@ exports.createSauce = (req, res, next) => {
     delete sauceObject._id;
 
     const sauce = new Sauce({
-        ...sauceObject,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        ,likes:0,
-        dislikes:0
+      ...sauceObject,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
+      likes: 0,
+      dislikes: 0,
     });
-
+console.log(sauce);
         sauce.save()
         .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
         .catch(error => res.status(400).json({ error }));
