@@ -6,6 +6,12 @@ const app = express();
 
 var bodyParser = require('body-parser');
 
+var dotenv = require("dotenv");
+dotenv.config();
+var urlmongo = process.env.MONGOLAB_URI;
+
+console.log(urlmongo);
+
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
@@ -21,12 +27,14 @@ app.use((req, res, next) => {
 
 
 
-mongoose.connect('mongodb+srv://OCAdmin:SoPekocko!42@cluster0.qm0fk.mongodb.net/Sopekocko?retryWrites=true&w=majority',
-  { useNewUrlParser: true,
+mongoose
+  .connect(urlmongo, {
+    useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex:true})
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+    useCreateIndex: true,
+  })
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
 
   const sauceRoutes = require('./routes/sauce');
   const userRoutes = require("./routes/user");

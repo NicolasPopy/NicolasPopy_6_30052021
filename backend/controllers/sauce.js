@@ -18,13 +18,12 @@ exports.createSauce = (req, res, next) => {
     //delete sauceObject._id;
 
     const sauce = new Sauce({
-        ...sauceObject,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        ,likes:0,
-        dislikes:0,
-        usersLiked:new Array(),
-        usersDisliked:new Array()
-
+      ...sauceObject,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
+      likes: 0,
+      dislikes: 0,
     });
 console.log(sauce);
         sauce.save()
@@ -54,8 +53,6 @@ exports.deleteSauce = (req,res,next) => {
 
 
 exports.likeSauce = async (req,res,next) => {
-
-    console.log("likesauce");
     var idsauce = req.params.id;
     var userId = req.body.userId;
     var like = req.body.like;
@@ -72,7 +69,6 @@ exports.likeSauce = async (req,res,next) => {
 
     var uDislike = sauce.usersDisliked != undefined && sauce.usersDisliked.includes(userId);
     var uLike =sauce.usersLiked != undefined &&  sauce.usersLiked.includes(userId);
-    console.log(sauce);
 
 
 switch (like) {
@@ -100,10 +96,8 @@ switch (like) {
         break;
     case 1:
         console.log('Like'); // compteur jaime et user dans tableau likeuser
-        console.log(sauce.likes);
         sauce.likes += 1;
         sauce.usersLiked.push(userId);
-        console.log(sauce.likes);
         break;
 };
 
