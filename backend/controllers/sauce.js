@@ -2,33 +2,48 @@ const Sauce = require("../models/sauce");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
+const fs = require('fs');
+
+//regex :
+const regex = "/^[A-9 _.,!()&]+$/";
+
+
 
 exports.getAllSauce = (req, res, next) => {        
     
         Sauce.find()
         .then(sauces => res.status(200).json(sauces))
         .catch(error => res.status(400).json({ error }));
-
 };
+
 
 
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     
-    //delete sauceObject._id;
+    if (!sauceObject.userId || !sauceObject.name ||
+        !sauceObject.manufacturer || !sauceObject.description ||
+        !sauceObject.mainPepper || !sauceObject.heat ||
+        !req.file.path) {
+        return res.status(422).json({ error: 'Un ou plusieurs champs n\'ont pas été remplis.' });
+    }
 
+    //Si les regex ne sont pas bonnes :
+    if (!regex.test(sauceObject.name) || !regex.test(sauceObject.manufacturer) ||
+        !regex.test(sauceObject.description) || !regex.test(sauceObject.mainPepper) ||
+        !regex.test(sauceObject.heat)) {
+        return res.status(422).json({ error: 'Des données saisies contiennent des caractères non autorisés.' });
+    }
     const sauce = new Sauce({
-      ...sauceObject,
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${
-        req.file.filename
-      }`,
-      likes: 0,
-      dislikes: 0,
+        ...sauceObject,
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
+        likes: 0,
+        dislikes: 0,
     });
-console.log(sauce);
-        sauce.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-        .catch(error => console.log(error) );
+
+    sauce.save()
+    .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
+    .catch(error => console.log(error) );
 };
 
 
@@ -41,14 +56,21 @@ exports.getOneSauce = (req,res,next) => {
 
 exports.modifySauce = (req,res,next) => {
     Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+    .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
     .catch(error => res.status(400).json({ error }));
 }
 
 exports.deleteSauce = (req,res,next) => {
-    Sauce.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-    .catch(error => res.status(400).json({ error }));
+    Sauce.findOne({ _id: req.params.id })
+    .then(sauce => {
+        const filename = sauce.imageUrl.split('/images/')[1];
+        fs.unlink(`images/${filename}`, () => {
+        Sauce.deleteOne({ _id: req.params.id })
+            .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
+            .catch(error => res.status(400).json({ error }));
+        });
+    })
+    .catch(error => res.status(500).json({ error }));
 }
 
 
@@ -64,7 +86,6 @@ exports.likeSauce = async (req,res,next) => {
 
     if(sauce.usersLiked == undefined)
         sauce.usersLiked = new Array();
-
 
 
     var uDislike = sauce.usersDisliked != undefined && sauce.usersDisliked.includes(userId);

@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const helmet = require("helmet");
+var cors = require('cors')
 
 const app = express();
 
@@ -10,10 +12,11 @@ var dotenv = require("dotenv");
 dotenv.config();
 var urlmongo = process.env.MONGOLAB_URI;
 
-console.log(urlmongo);
-
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
+
+app.use(helmet());
+app.use(cors())
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
