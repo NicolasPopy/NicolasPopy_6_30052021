@@ -7,10 +7,11 @@ const mongoose = require('mongoose');
 exports.signup = (req, res, next) => {
 
 
-  var Regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+  var Regex = new RegExp("^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,}$");
   if(Regex.test(req.body.password) == false) {
-    //res.status(499).send({ message : "Le mot de passe entré n'est pas assez complexe." });
-    throw new Error("Le mot de passe entré n'est pas assez complexe.");
+    res.writeHead(500,
+      'Mot de passe requis : 8 caractères minimun. Au moins 1 majuscule, 1 minuscule, 1 chiffre et un caractère spécial !');  
+      res.end();
   }
   else{
 
@@ -27,7 +28,10 @@ exports.signup = (req, res, next) => {
         user
           .save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-          .catch((error) => res.status(400).json({ error }));
+          .catch((error) =>  {
+            res.writeHead(400,error);  
+            res.end();
+          });
       })
       .catch((err) => {next(err);});
   }
@@ -40,13 +44,15 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then(user => {
-      if (!user) {
-        return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+      if (!user) {       
+          res.writeHead(500,"Cet utilisateur n'existe pas dans notre base de données");  
+          res.end();       
       }
       bcrypt.compare(req.body.password, user.password)
         .then(valid => {
           if (!valid) {
-            return res.status(401).json({ error: 'Mot de passe incorrect !' });
+            res.writeHead(500,"Le mot de passe est incorrrect.");  
+          res.end();  
           }
           res.status(200).json({
             userId: user._id,
@@ -57,8 +63,14 @@ exports.login = (req, res, next) => {
             )
           });
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => {
+          res.writeHead(500,error);  
+        res.end();  
+        });
     })
-    .catch(error => res.status(500).json({ error }));
+    .catch(error => {
+      res.writeHead(500,error);  
+    res.end();  
+    });
 };
 
