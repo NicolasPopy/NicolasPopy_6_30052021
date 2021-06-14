@@ -6,11 +6,10 @@ const mongoose = require('mongoose');
 
 exports.signup = (req, res, next) => {
 
-
-  var Regex = new RegExp("^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,}$");
+  var Regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
   if(Regex.test(req.body.password) == false) {
-    res.writeHead(500,
-      'Mot de passe requis : 8 caractères minimun. Au moins 1 majuscule, 1 minuscule, 1 chiffre et un caractère spécial !');  
+    res.writeHead(400,
+      'Mot de passe requis : 8 caractères minimum. Au moins 1 majuscule, 1 minuscule, 1 chiffre et un caractère spécial.');  
       res.end();
   }
   else{
@@ -29,19 +28,19 @@ exports.signup = (req, res, next) => {
           .save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
           .catch((error) =>  {
+            console.log(error);
             res.writeHead(400,error);  
             res.end();
           });
       })
       .catch((err) => {next(err);});
   }
-
-
 };
 
 
 
 exports.login = (req, res, next) => {
+
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {       
@@ -69,8 +68,8 @@ exports.login = (req, res, next) => {
         });
     })
     .catch(error => {
-      res.writeHead(500,error);  
-    res.end();  
+     /*  res.writeHead(500,error);  
+    res.end();   */
     });
 };
 

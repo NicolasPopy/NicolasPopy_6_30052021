@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 
 //regex :
-const regex = "/^[A-9 _.,!()&]+$/";
+var regex = /^[A-Za-z\d@$!%*#?&]{2,}$/;
 
 
 
@@ -123,6 +123,6 @@ switch (like) {
 };
 
 Sauce.updateOne({ _id: idsauce }, { dislikes : sauce.dislikes,usersDisliked:sauce.usersDisliked,likes:sauce.likes,usersLiked:sauce.usersLiked, _id: idsauce })
-.then(() => res.status(200).json({ message: 'Objet modifié !'}))
+.then(() => res.status(200).json({ message: 'Compteur de sauce modifié !'}))
     .catch(error => res.status(400).json({ error }));
 }
