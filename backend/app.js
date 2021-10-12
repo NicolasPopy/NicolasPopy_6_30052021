@@ -28,8 +28,6 @@ app.use((req, res, next) => {
 });
 
 
-
-
 mongoose
   .connect(urlmongo, {
     useNewUrlParser: true,

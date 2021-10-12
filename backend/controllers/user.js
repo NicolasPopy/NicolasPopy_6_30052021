@@ -14,12 +14,29 @@ exports.signup = (req, res, next) => {
   }
   else{
 
+
+    //  ## Recherche si email existe déjà en BDD
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (user) {
+          res.writeHead(
+            500,
+            "Cet utilisateur existe déjà dans notre base de données"
+          );
+          res.end();
+        }
+      })
+      .catch((err) => {
+        next(err);
+      });
+
+
+      // Sauvegarde
     bcrypt
       .hash(req.body.password, 10)
       .then((hash) => {
-
         const user = new User({
-          userId: new mongoose.mongo.ObjectId(),
+         /*  userId: new mongoose.mongo.ObjectId(), */
           email: req.body.email,
           password: hash,
         });
@@ -28,7 +45,6 @@ exports.signup = (req, res, next) => {
           .save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
           .catch((error) =>  {
-            console.log(error);
             res.writeHead(400,error);  
             res.end();
           });
@@ -68,8 +84,8 @@ exports.login = (req, res, next) => {
         });
     })
     .catch(error => {
-     /*  res.writeHead(500,error);  
-    res.end();   */
+      res.writeHead(500,error);  
+      res.end();   
     });
 };
 

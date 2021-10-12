@@ -28,12 +28,7 @@ exports.createSauce = (req, res, next) => {
         return res.status(422).json({ error: 'Un ou plusieurs champs n\'ont pas été remplis.' });
     }
 
-    //Si les regex ne sont pas bonnes :
-    if (!regex.test(sauceObject.name) || !regex.test(sauceObject.manufacturer) ||
-        !regex.test(sauceObject.description) || !regex.test(sauceObject.mainPepper) ||
-        !regex.test(sauceObject.heat)) {
-        return res.status(422).json({ error: 'Des données saisies contiennent des caractères non autorisés.' });
-    }
+
     const sauce = new Sauce({
         ...sauceObject,
         imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
@@ -94,13 +89,13 @@ exports.likeSauce = async (req,res,next) => {
 
 switch (like) {
     case -1:
-        console.log('Dislike'); // compteur j'aime pas et user dans tableau dislikeuser
+        // compteur j'aime pas et user dans tableau dislikeuser
         sauce.dislikes += 1;
         sauce.usersDisliked.push(userId);
         
         break
     case 0:
-        console.log('Annule'); // compteur -1 et enlève user du tableau où il est
+        // compteur -1 et enlève user du tableau où il est
         if(uDislike == true)
         { 
             sauce.dislikes -= 1;
@@ -116,7 +111,7 @@ switch (like) {
         }
         break;
     case 1:
-        console.log('Like'); // compteur jaime et user dans tableau likeuser
+        // compteur jaime et user dans tableau likeuser
         sauce.likes += 1;
         sauce.usersLiked.push(userId);
         break;
