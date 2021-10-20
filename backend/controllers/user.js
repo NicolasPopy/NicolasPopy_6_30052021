@@ -36,7 +36,6 @@ exports.signup = (req, res, next) => {
       .hash(req.body.password, 10)
       .then((hash) => {
         const user = new User({
-         /*  userId: new mongoose.mongo.ObjectId(), */
           email: req.body.email,
           password: hash,
         });
@@ -53,20 +52,22 @@ exports.signup = (req, res, next) => {
   }
 };
 
-
+// ###################################
+// Login
+// ##############################
 
 exports.login = (req, res, next) => {
 
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {       
-          res.writeHead(500,"Cet utilisateur n'existe pas dans notre base de données");  
+          res.writeHead(401,"Cet utilisateur n'existe pas dans notre base de données");  
           res.end();       
       }
       bcrypt.compare(req.body.password, user.password)
         .then(valid => {
           if (!valid) {
-            res.writeHead(500,"Le mot de passe est incorrrect.");  
+            res.writeHead(401,"Le mot de passe est incorrrect.");  
           res.end();  
           }
           res.status(200).json({

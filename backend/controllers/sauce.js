@@ -8,6 +8,9 @@ const fs = require('fs');
 var regex = /^[A-Za-z\d@$!%*#?&]{2,}$/;
 
 
+// #################################################################
+// Récupére toutes les sauces
+// #################################################################
 
 exports.getAllSauce = (req, res, next) => {        
     
@@ -16,7 +19,9 @@ exports.getAllSauce = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-
+// #################################################################
+// Crée une sauce
+// #################################################################
 
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
@@ -41,6 +46,9 @@ exports.createSauce = (req, res, next) => {
     .catch(error => console.log(error) );
 };
 
+// #################################################################
+// Récupére 1 sauce
+// #################################################################
 
 exports.getOneSauce = (req,res,next) => {
     Sauce.findOne({ _id: req.params.id })
@@ -48,12 +56,19 @@ exports.getOneSauce = (req,res,next) => {
     .catch(error => res.status(404).json({ error }));
 }
 
+// #################################################################
+// Modifie 1 sauce
+// #################################################################
 
 exports.modifySauce = (req,res,next) => {
     Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
     .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
     .catch(error => res.status(400).json({ error }));
 }
+
+// #################################################################
+// Efface une sauce
+// #################################################################
 
 exports.deleteSauce = (req,res,next) => {
     Sauce.findOne({ _id: req.params.id })
@@ -68,6 +83,10 @@ exports.deleteSauce = (req,res,next) => {
     .catch(error => res.status(500).json({ error }));
 }
 
+
+// #################################################################
+// Like/Dislike une sauce
+// #################################################################
 
 exports.likeSauce = async (req,res,next) => {
     var idsauce = req.params.id;
@@ -87,37 +106,37 @@ exports.likeSauce = async (req,res,next) => {
     var uLike =sauce.usersLiked != undefined &&  sauce.usersLiked.includes(userId);
 
 
-switch (like) {
-    case -1:
-        // compteur j'aime pas et user dans tableau dislikeuser
-        sauce.dislikes += 1;
-        sauce.usersDisliked.push(userId);
-        
-        break
-    case 0:
-        // compteur -1 et enlève user du tableau où il est
-        if(uDislike == true)
-        { 
-            sauce.dislikes -= 1;
-            sauce.usersDisliked.remove(userId);
-        }
-        else
-        {
-            if(uLike == true)
+    switch (like) {
+        case -1:
+            // compteur j'aime pas et user dans tableau dislikeuser
+            sauce.dislikes += 1;
+            sauce.usersDisliked.push(userId);
+            
+            break
+        case 0:
+            // compteur -1 et enlève user du tableau où il est
+            if(uDislike == true)
             { 
-                sauce.likes -= 1;
-                sauce.usersLiked.remove(userId);
+                sauce.dislikes -= 1;
+                sauce.usersDisliked.remove(userId);
             }
-        }
-        break;
-    case 1:
-        // compteur jaime et user dans tableau likeuser
-        sauce.likes += 1;
-        sauce.usersLiked.push(userId);
-        break;
-};
+            else
+            {
+                if(uLike == true)
+                { 
+                    sauce.likes -= 1;
+                    sauce.usersLiked.remove(userId);
+                }
+            }
+            break;
+        case 1:
+            // compteur jaime et user dans tableau likeuser
+            sauce.likes += 1;
+            sauce.usersLiked.push(userId);
+            break;
+    };
 
-Sauce.updateOne({ _id: idsauce }, { dislikes : sauce.dislikes,usersDisliked:sauce.usersDisliked,likes:sauce.likes,usersLiked:sauce.usersLiked, _id: idsauce })
-.then(() => res.status(200).json({ message: 'Compteur de sauce modifié !'}))
-    .catch(error => res.status(400).json({ error }));
+    Sauce.updateOne({ _id: idsauce }, { dislikes : sauce.dislikes,usersDisliked:sauce.usersDisliked,likes:sauce.likes,usersLiked:sauce.usersLiked, _id: idsauce })
+    .then(() => res.status(200).json({ message: 'Compteur de sauce modifié !'}))
+        .catch(error => res.status(400).json({ error }));
 }

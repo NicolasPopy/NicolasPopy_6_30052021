@@ -1,6 +1,8 @@
 const http = require('http');
 const app = require('./app');
 
+
+// Vérifie que le port fourni est un entier sinon false
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -15,6 +17,7 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
@@ -23,11 +26,11 @@ const errorHandler = error => {
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port: ' + port;
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges.');
+      console.error(bind + ' requiert des priviléges élevés d\'accès.');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use.');
+      console.error(bind + ' est déjà en cours d\'utilisation.');
       process.exit(1);
       break;
     default:
