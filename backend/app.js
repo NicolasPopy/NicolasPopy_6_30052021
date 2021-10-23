@@ -31,11 +31,10 @@ app.use((req, res, next) => {
 mongoose
   .connect(urlmongo, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
+    useUnifiedTopology: true
   })
   .then(() => console.log("Connexion à MongoDB réussie !"))
-  .catch(() => console.log("Connexion à MongoDB échouée !"));
+  .catch((err) => console.log("Connexion à MongoDB échouée !" + err));
 
   const sauceRoutes = require('./routes/sauce');
   const userRoutes = require("./routes/user");

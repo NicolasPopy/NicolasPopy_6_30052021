@@ -3,6 +3,7 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
+const CryptoJS = require("crypto-js");
 
 exports.signup = (req, res, next) => {
 
@@ -14,9 +15,13 @@ exports.signup = (req, res, next) => {
   }
   else{
 
+    var emailcrypt = CryptoJS.SHA256(
+      req.body.email,
+      "68.4t2r*Y595W8$T"
+    ).toString();
 
     //  ## Recherche si email existe déjà en BDD
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: emailcrypt })
       .then((user) => {
         if (user) {
           res.writeHead(
@@ -36,7 +41,7 @@ exports.signup = (req, res, next) => {
       .hash(req.body.password, 10)
       .then((hash) => {
         const user = new User({
-          email: req.body.email,
+          email: emailcrypt,
           password: hash,
         });
 
@@ -58,35 +63,48 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
 
-  User.findOne({ email: req.body.email })
-    .then(user => {
-      if (!user) {       
-          res.writeHead(401,"Cet utilisateur n'existe pas dans notre base de données");  
-          res.end();       
+
+      var emailcrypt = CryptoJS.SHA256(
+        req.body.email,
+        "68.4t2r*Y595W8$T"
+      ).toString();
+
+  User.findOne({ email: emailcrypt })
+    .then((user) => {
+      if (!user) {
+        res.writeHead(
+          401,
+          "Cet utilisateur n'existe pas dans notre base de données"
+        );
+        res.end();
       }
-      bcrypt.compare(req.body.password, user.password)
-        .then(valid => {
+      bcrypt
+        .compare(req.body.password, user.password)
+        .then((valid) => {
           if (!valid) {
-            res.writeHead(401,"Le mot de passe est incorrrect.");  
-          res.end();  
+            res.writeHead(401, "Le mot de passe est incorrrect.");
+            res.end();
           }
           res.status(200).json({
             userId: user._id,
             token: jwt.sign(
               { userId: user._id },
-              '2Kn%Bc`zj!CMyrP1g`eHdhJcmazyTU',
-              { expiresIn: '24h' }
-            )
+              "2Kn%Bc`zj!CMyrP1g`eHdhJcmazyTU",
+              { expiresIn: "24h" }
+            ),
           });
         })
-        .catch(error => {
-          res.writeHead(500,error);  
-        res.end();  
+        .catch((error) => {
+          res.writeHead(500, error);
+          res.end();
         });
     })
-    .catch(error => {
-      res.writeHead(500,error);  
-      res.end();   
+    .catch((error) => {
+      res.writeHead(500, error);
+      res.end();
     });
 };
+
+
+
 
